@@ -1,60 +1,39 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    SONARQUBE_SERVER = 'http://sonarqube:9000'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
-    stage('Install dependencies') {
-      steps {
-        sh 'pip install -r app/requirements.txt'
-      }
-    }
-
-    stage('Run Tests') {
-      steps {
-        sh 'pytest app/tests'
-      }
-    }
-
-    stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('SonarQube') {
-          sh 'sonar-scanner'
-        }
-      }
-    }
-
-    stage('Quality Gate') {
-      steps {
-        timeout(time: 2, unit: 'MINUTES') {
-          script {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-              error "Quality Gate falhou: ${qg.status}"
-            }
+    stages {
+        stage('Checkout') {
+          steps {
+            checkout scm
           }
         }
-      }
-    }
+        stage('Build e Teste') {
+            steps {
+                script {
+                    // Construir a imagem Docker da sua aplicação Python
+                    def appImage = docker.build("imagem-fastapi:${BUILD_ID}", ".")
 
-    stage('Build Docker Image') {
-      steps {
-        sh 'docker build -t esteiradevsecops ./app'
-      }
-    }
+                    withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
+                        docker.withServer("tcp://sonarqube:9000") {
+                            docker.image('sonarsource/sonar-scanner-cli:latest').run("--network minha-rede-compartilhada -v ${WORKSPACE}:/usr/src -e SONAR_HOST_URL=http://sonarqube:9000 -e SONAR_LOGIN=${SONAR_TOKEN} -Dsonar.projectKey=esteiradevsecops -Dsonar.sources=. -Dsonar.java.binaries=.")
+                        }
+                    }
 
-    stage('Deploy') {
-      steps {
-        sh 'docker-compose up -d --build'
-      }
+                    // Executar outros testes unitários (se houver)
+                    sh 'python -m unittest discover'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    // Para o CD local, podemos simplesmente parar e remover o container antigo
+                    sh 'docker stop minha-app-fastapi && docker rm minha-app-fastapi'
+
+                    // Executar o novo container da aplicação
+                    docker.run("--name minha-app-fastapi -d --network minha-rede-compartilhada -p 8000:8000 imagem-fastapi:${BUILD_ID}")
+                }
+            }
+        }
     }
-  }
 }

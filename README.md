@@ -1,2 +1,2 @@
 # esteiradevsecops
-Esteira DevOps automatizada de CI &amp; CD
+Esteira DevOps automatizada de CI &amp; 
