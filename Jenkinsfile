@@ -15,7 +15,7 @@ pipeline {
 
                     withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
                         docker.withServer("tcp://sonarqube:9000") {
-                            docker.image('sonarsource/sonar-scanner-cli:latest').run("--network minha-rede-compartilhada -v ${WORKSPACE}:/usr/src -e SONAR_HOST_URL=http://sonarqube:9000 -e SONAR_LOGIN=${SONAR_TOKEN} -Dsonar.projectKey=esteiradevsecops -Dsonar.sources=. -Dsonar.java.binaries=.")
+                            docker.image('sonarsource/sonar-scanner-cli:latest').run("--network minha-rede-compartilhada -v ${WORKSPACE}:/usr/src -e SONAR_HOST_URL=http://sonarqube:9000 -e SONAR_LOGIN=${SONAR_TOKEN} -Dsonar.projectKey=esteiradevsecops -Dsonar.sources=.")
                         }
                     }
 
