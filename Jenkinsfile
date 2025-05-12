@@ -10,6 +10,9 @@ pipeline {
         stage('Build e Teste') {
             steps {
                 script {
+                    echo "Tentando executar um comando docker básico..."
+                    sh 'docker info' // Ou 'docker version'
+                    echo "Construindo a imagem Docker da aplicação Python..."
                     // Construir a imagem Docker da sua aplicação Python
                     def appImage = docker.build("imagem-fastapi:${BUILD_ID}", ".")
 
