@@ -10,8 +10,9 @@ pipeline {
         stage('Build e Teste') {
             steps {
                 script {
-                    // Construir a imagem Docker da sua aplicação Python DENTRO de um container Docker gerenciado pelo plugin
-                    def appImage = docker.image('docker:latest').build("imagem-fastapi:${BUILD_ID}", ".")
+                    // Construir a imagem Docker da sua aplicação Python
+                    def dockerImage = docker.image('docker:latest')
+                    def appImage = dockerImage.build("imagem-fastapi:${BUILD_ID}", ".")
 
                     withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
                         // Executar o scanner SonarQube como um container Docker gerenciado pelo plugin
