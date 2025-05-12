@@ -15,10 +15,17 @@ pipeline {
         }
 
         stage('Testes') {
+            agent {
+                docker {
+                    image 'python:3.10'
+                }
+            }
             steps {
+                sh 'pip install -r requirements.txt || true' // opcional
                 sh 'python -m unittest discover'
             }
         }
+
 
         stage('SonarQube') {
             steps {
