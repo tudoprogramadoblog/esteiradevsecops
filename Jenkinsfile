@@ -22,19 +22,24 @@ pipeline {
 
         stage('SonarQube') {
             steps {
-                withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
-                    docker.image('sonarsource/sonar-scanner-cli:latest').inside("--network minha-rede-compartilhada -v ${WORKSPACE}:/usr/src") {
-                        sh """
-                            sonar-scanner \
-                                -Dsonar.host.url=${SONAR_HOST} \
-                                -Dsonar.login=${SONAR_TOKEN} \
-                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                -Dsonar.sources=.
-                        """
+                script {
+                    echo 'Executando análise com SonarQube...'
+                    withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
+                        def scannerImage = docker.image('sonarsource/sonar-scanner-cli:latest')
+                        scannerImage.inside("-v ${env.WORKSPACE}:/usr/src -w /usr/src --network host") {
+                            sh """
+                                sonar-scanner \
+                                    -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.host.url=${env.SONAR_HOST} \
+                                    -Dsonar.login=${env.SONAR_TOKEN}
+                            """
+                        }
                     }
                 }
             }
         }
+
 
         stage('Build') {
             steps {
