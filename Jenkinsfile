@@ -12,12 +12,12 @@ pipeline {
                 script {
                     // Construir a imagem Docker da sua aplicação Python
                     def dockerImage = docker.image('docker:latest')
-                    def appImage = dockerImage.build("imagem-fastapi:${BUILD_ID}", ".")
+                    def appImage = dockerImage.build("imagem-fastapi:${BUILD_ID}")
 
                     withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
                         // Executar o scanner SonarQube como um container Docker gerenciado pelo plugin
                         docker.image('sonarsource/sonar-scanner-cli:latest').inside("--network minha-rede-compartilhada -v ${WORKSPACE}:/usr/src") {
-                            sh "sonar-scanner -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=esteiradevsecops -Dsonar.sources=."
+                            sh "sonar-scanner -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=esteiradevsecops -Dsonar.sources=."// -Dsonar.java.binaries=."
                         }
                     }
 
