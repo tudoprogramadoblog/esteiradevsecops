@@ -30,13 +30,12 @@ pipeline {
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
-                    withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
-                        sh """#!/bin/bash
-                            sonar-scanner \\
-                                -Dsonar.projectKey=$SONAR_PROJECT_KEY \\
-                                -Dsonar.sources=. \\
-                                -Dsonar.host.url=$SONAR_HOST \\
-                                -Dsonar.login=$SONAR_TOKEN
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=esteiradevsecops \
+                            -Dsonar.sources=. \
+                            -Dsonar.login=$SONAR_TOKEN_ID
                         """
                     }
                 }
