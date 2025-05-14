@@ -35,7 +35,7 @@ pipeline {
                         sonar-scanner \
                             -Dsonar.projectKey=esteiradevsecops \
                             -Dsonar.sources=. \
-                            -Dsonar.login=$SONAR_TOKEN_ID
+                            -Dsonar.login=$SONAR_TOKEN
                         """
                     }
                 }
