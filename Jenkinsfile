@@ -30,14 +30,17 @@ pipeline {
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                        sonar-scanner \
-                            -Dsonar.projectKey=esteiradevsecops \
-                            -Dsonar.sources=. \
-                            -Dsonar.login=$SONAR_TOKEN
-                        """
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
+                        withSonarQubeEnv('SonarQube') {
+                            sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                                -Dsonar.sources=. \
+                                -Dsonar.login=$SONAR_TOKEN
+                            """
+                        }
                     }
+
                 }
             }
         }
