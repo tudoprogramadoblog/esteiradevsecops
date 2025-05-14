@@ -1,12 +1,12 @@
 pipeline {
     agent any
-
+    /*
     environment {
         SONAR_HOST = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY = 'esteiradevsecops'
         DOCKER_IMAGE_TAG = "imagem-fastapi:${BUILD_ID}"
         SONAR_TOKEN = credentials('SONAR_TOKEN') // Certifique-se que este ID está correto no Jenkins
-    }
+    }*/
 
     stages {
         stage('Checkout') {
@@ -27,14 +27,16 @@ pipeline {
                 sh 'pip install -r app/requirements.txt || true'
                 // Rodar os testes com pytest e cobertura de código
                 sh 'coverage run -m pytest app/tests --maxfail=5 --disable-warnings -q'
-                //sh 'python -m unittest discover -s app/tests -p "*.py"'
-                //sh 'coverage run -m pytest app/tests'
                 // Gerar o arquivo coverage.xml para o SonarQube
                 sh 'coverage xml'
             }
         }
 
         stage('SonarQube') {
+            environment {
+                SONAR_PROJECT_KEY = 'esteiradevsecops'
+                SONAR_HOST = 'http://sonarqube:9000'
+            }
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
