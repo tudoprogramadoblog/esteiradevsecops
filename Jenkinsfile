@@ -5,6 +5,7 @@ pipeline {
         SONAR_HOST = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY = 'esteiradevsecops'
         DOCKER_IMAGE_TAG = "imagem-fastapi:${BUILD_ID}"
+        SONAR_TOKEN = credentials('SONAR_TOKEN')//('sonar-token-id') // Configure como credential no Jenkins
     }
 
     stages {
@@ -22,7 +23,10 @@ pipeline {
             }
             steps {
                 sh 'pip install -r app/requirements.txt || true'
-                sh 'python -m unittest discover'
+                sh 'python -m unittest discover -s app/tests -p "*.py"'
+                sh 'coverage run -m pytest app/tests'
+                sh 'coverage xml' // Gera coverage.xml para o SonarQube
+                //sh 'pytest app/tests'
             }
         }
 
@@ -32,7 +36,14 @@ pipeline {
                     echo 'Executando análise com SonarQube...'
                     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                         withSonarQubeEnv('SonarQube') {
-                            sh "sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN"
+                            sh """
+                        sonar-scanner \
+                        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                        -Dsonar.sources=app \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
                         }
                     }
                 }
