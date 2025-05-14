@@ -25,9 +25,12 @@ pipeline {
             steps {
                 sh 'python -m pip install --upgrade pip'
                 sh 'pip install -r app/requirements.txt || true'
-                sh 'python -m unittest discover -s app/tests -p "*.py"'
-                sh 'coverage run -m pytest app/tests'
-                sh 'coverage xml' // Gera coverage.xml para o SonarQube
+                // Rodar os testes com pytest e cobertura de código
+                sh 'coverage run -m pytest app/tests --maxfail=5 --disable-warnings -q'
+                //sh 'python -m unittest discover -s app/tests -p "*.py"'
+                //sh 'coverage run -m pytest app/tests'
+                // Gerar o arquivo coverage.xml para o SonarQube
+                sh 'coverage xml'
             }
         }
 
