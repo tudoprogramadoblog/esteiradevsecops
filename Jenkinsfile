@@ -21,31 +21,27 @@ pipeline {
                 }
             }
             steps {
-                sh 'pip install -r requirements.txt || true' // opcional
+                sh 'pip install -r requirements.txt || true'
                 sh 'python -m unittest discover'
             }
         }
-
 
         stage('SonarQube') {
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
                     withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
-                            sh '''
-                                sonar-scanner \
-                                -Dsonar.projectKey=esteiradevsecops \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=http://sonarqube:9000 \
+                        sh """#!/bin/bash
+                            sonar-scanner \\
+                                -Dsonar.projectKey=$SONAR_PROJECT_KEY \\
+                                -Dsonar.sources=. \\
+                                -Dsonar.host.url=$SONAR_HOST \\
                                 -Dsonar.login=$SONAR_TOKEN
-                            '''
-                        }
-
+                        """
                     }
                 }
             }
         }
-
 
         stage('Build') {
             steps {
