@@ -2,7 +2,7 @@ fastapi
 uvicorn
 psycopg2-binary
 sqlalchemy
-pydanti
+pydantic
 requests
 # Testes e cobertura
 pytest

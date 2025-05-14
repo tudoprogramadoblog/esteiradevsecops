@@ -22,6 +22,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'python -m pip install --upgrade pip'
                 sh 'pip install -r app/requirements.txt || true'
                 sh 'python -m unittest discover -s app/tests -p "*.py"'
                 sh 'coverage run -m pytest app/tests'
