@@ -31,17 +31,16 @@ pipeline {
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
-                    withCredentials([string(credentialsId: 'Jenkins_CI', variable: 'SONAR_TOKEN')]) {
-                        def scannerImage = docker.image('sonarsource/sonar-scanner-cli:latest')
-                        scannerImage.inside("-v ${env.WORKSPACE}:/usr/src -w /usr/src --network host") {
-                            sh """
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
+                            sh '''
                                 sonar-scanner \
-                                    -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} \
-                                    -Dsonar.sources=. \
-                                    -Dsonar.host.url=${env.SONAR_HOST} \
-                                    -Dsonar.login=${env.SONAR_TOKEN}
-                            """
+                                -Dsonar.projectKey=esteiradevsecops \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=http://sonarqube:9000 \
+                                -Dsonar.login=$SONAR_TOKEN
+                            '''
                         }
+
                     }
                 }
             }
@@ -61,7 +60,9 @@ pipeline {
                 script {
                     sh 'docker stop minha-app-fastapi || true'
                     sh 'docker rm minha-app-fastapi || true'
-                    docker.image(env.DOCKER_IMAGE_TAG).run("--name minha-app-fastapi -d --network minha-rede-compartilhada -p 8000:8000")
+                    docker.image(env.DOCKER_IMAGE_TAG).run(
+                        "--name minha-app-fastapi -d --network minha-rede-compartilhada -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock"
+                    )
                 }
             }
         }
