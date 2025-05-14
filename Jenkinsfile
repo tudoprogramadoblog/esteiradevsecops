@@ -22,12 +22,14 @@ pipeline {
                 }
             }
             steps {
-                sh 'python -m pip install --user --upgrade pip'
-                sh 'pip install -r --user app/requirements.txt || true'
-                sh 'python -m unittest discover -s app/tests -p "*.py"'
-                sh 'coverage run -m pytest app/tests'
-                sh 'coverage xml' // Gera coverage.xml para o SonarQube
-                //sh 'pytest app/tests'
+                withDockerContainer(image: 'python:3.10', args: '-u root') {
+                    sh 'python -m pip install --upgrade pip'
+                    sh 'pip install -r app/requirements.txt || true'
+                    sh 'python -m unittest discover -s app/tests -p "*.py"'
+                    sh 'coverage run -m pytest app/tests'
+                    sh 'coverage xml' // Gera coverage.xml para o SonarQube
+                    //sh 'pytest app/tests'
+                }
             }
         }
 
