@@ -21,7 +21,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'pip install -r requirements.txt || true'
+                sh 'pip install -r app/requirements.txt || true'
                 sh 'python -m unittest discover'
             }
         }
@@ -30,17 +30,11 @@ pipeline {
             steps {
                 script {
                     echo 'Executando análise com SonarQube...'
-                    withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                         withSonarQubeEnv('SonarQube') {
-                            sh """
-                            sonar-scanner \
-                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                -Dsonar.sources=. \
-                                -Dsonar.login=$SONAR_TOKEN
-                            """
+                            sh "sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN"
                         }
                     }
-
                 }
             }
         }
