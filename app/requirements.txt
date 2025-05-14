@@ -4,6 +4,7 @@ psycopg2-binary
 sqlalchemy
 pydantic
 requests
+httpx
 # Testes e cobertura
 pytest
 coverage
