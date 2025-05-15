@@ -1,12 +1,12 @@
 pipeline {
     agent any
-    /*
+
     environment {
         SONAR_HOST = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY = 'esteiradevsecops'
         DOCKER_IMAGE_TAG = "imagem-fastapi:${BUILD_ID}"
         SONAR_TOKEN = credentials('SONAR_TOKEN') // Certifique-se que este ID está correto no Jenkins
-    }*/
+    }
 
     stages {
         stage('Checkout') {
