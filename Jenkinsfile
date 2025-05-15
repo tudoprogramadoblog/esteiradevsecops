@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
         SONAR_HOST = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY = 'esteiradevsecops'
         DOCKER_IMAGE_TAG = "imagem-fastapi:${BUILD_ID}"
@@ -33,8 +34,14 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv("SonarQube") {
-                    sh 'sonar-scanner'
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        sonar-scanner \
+                        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=$SONAR_HOST \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
                 }
             }
         }
