@@ -5,7 +5,6 @@ pipeline {
         SONAR_HOST = 'http://sonarqube:9000'
         SONAR_PROJECT_KEY = 'esteiradevsecops'
         DOCKER_IMAGE_TAG = "imagem-fastapi:${BUILD_ID}"
-        SONAR_TOKEN = credentials('SONAR_TOKEN') // Certifique-se que este ID está correto no Jenkins
     }
 
     stages {
@@ -31,31 +30,15 @@ pipeline {
                 sh 'coverage xml'
             }
         }
-        /*
-        stage('SonarQube') {
-            environment {
-                SONAR_PROJECT_KEY = 'esteiradevsecops'
-                SONAR_HOST = 'http://sonarqube:9000'
-            }
+        
+        stage('SonarQube Analysis') {
             steps {
-                script {
-                    echo 'Executando análise com SonarQube...'
-                    withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-                        withSonarQubeEnv('SonarQube') {
-                            sh """
-                                sonar-scanner \
-                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                -Dsonar.sources=app \
-                                -Dsonar.python.coverage.reportPaths=coverage.xml \
-                                -Dsonar.host.url=${SONAR_HOST} \
-                                -Dsonar.login=${SONAR_TOKEN}
-                            """
-                        }
-                    }
+                withSonarQubeEnv("SonarQube") {
+                    sh 'sonar-scanner'
                 }
             }
         }
-        */
+
         stage('Build') {
             steps {
                 script {
