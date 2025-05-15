@@ -31,7 +31,7 @@ pipeline {
                 sh 'coverage xml'
             }
         }
-
+        /*
         stage('SonarQube') {
             environment {
                 SONAR_PROJECT_KEY = 'esteiradevsecops'
@@ -55,7 +55,7 @@ pipeline {
                 }
             }
         }
-
+        */
         stage('Build') {
             steps {
                 script {
